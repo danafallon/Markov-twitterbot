@@ -2,6 +2,8 @@ import os
 
 import twitter
 
+import markovgen          # import our generator
+
 
 # Use Python os.environ to get at environmental variables
 #
@@ -18,5 +20,6 @@ api = twitter.Api(
 print api.VerifyCredentials()
 
 # Send a tweet
-status = api.PostUpdate('tweet body here')
+
+status = api.PostUpdate(markovgen.generate_tweet("Kafka-in-wonderland.txt", 2))
 print status.text

@@ -35,31 +35,33 @@ class SimpleMarkovGenerator(object):
 
         punctuation = "?.!"                                         # create punctuation string    
 
-        while dictionary.get(starting_key) != None and len(new_text_string) < limit:             # Continue until the key is not found in the dictionary
+        while dictionary.get(starting_key) != None and len(new_text_string) < limit:             # Continue until the key is not found in the dictionary or until the limit is hit
             value_list = dictionary[starting_key]               # assign value of key (list)
             next_word = random.choice(value_list)               # choose random word w/in list
             new_text_string = new_text_string + " " + next_word     # add next_word to list of created text
             starting_key = tuple(list(starting_key[1:]) + [next_word])   # create new tuple from second word of previous tuple + item at that index
             #print "at start of while loop:", new_text_string
 
-            if len(new_text_string) > limit:        # if length of the current string is greater than the limit, iterate through each character from the end to find punctuation
-                for i in range(len(new_text_string)-1,-1,-1):
+            while len(new_text_string) > limit:        # if length of the current string is greater than the limit, iterate through each character from the end to find punctuation
+                # print "if block initiated", len(new_text_string), new_text_string
+                for i in range(len(new_text_string)-2,-1,-1):
+                    # print "checking next character", len(new_text_string)
                     if new_text_string[i] in punctuation:
                         new_text_string = new_text_string[0:(i+1)] # cut off string at punctuation
-                        #print "after cutting at punct:", new_text_string
-
-                        if len(new_text_string) > limit:           # This will only be true if no puncutation was found! check again if the length is greater than the limit
-                            new_text_string = new_text_string[:(limit-2)]   # cut off string according to given limit
-                            #print "after chopping:", new_text_string
-                break
+                        print "after cutting at punct:", len(new_text_string)
+                        if len(new_text_string) <= limit:
+                            return new_text_string
+                else:                                           # if no punctuation was found:
+                    new_text_string = new_text_string[:limit]   # chop off after 140 characters
 
         return new_text_string                                  # return new text
 
 
-if __name__ == "__main__":
-    script, filename, ngram = sys.argv                          # unpack sys.argv arguments
+def generate_tweet(filename, ngram):
+    # script, filename, ngram = sys.argv                          # unpack sys.argv arguments
     generator = SimpleMarkovGenerator()        # change this line based on which generator you want to use
     dictionary = generator.make_chains(ngram, generator.read_file(filename))
     random_text = generator.make_text(dictionary)                   # Produce random text
 
-    print random_text
+    return random_text
+
